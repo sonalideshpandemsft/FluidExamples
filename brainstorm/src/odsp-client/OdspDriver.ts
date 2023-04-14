@@ -9,7 +9,6 @@ import type {
 	OdspResourceTokenFetchOptions,
 	HostStoragePolicy,
 } from "@fluidframework/odsp-driver-definitions";
-import { getMicrosoftConfiguration } from "@fluidframework/tool-utils";
 import {
 	OdspDocumentServiceFactory,
 	createOdspCreateContainerRequest,
@@ -114,6 +113,15 @@ export class OdspDriver {
 		tenantName?: string,
 		endpointName?: string,
 	) {
+		const getMicrosoftConfiguration = (): IClientConfig => ({
+			get clientId() {
+				return "059932a5-f5fd-412a-b90d-6d42d6545db7";
+			},
+			get clientSecret() {
+				return "<enter-secret>";
+			},
+		});
+
 		const tokenConfig: TokenConfig = {
 			...loginConfig,
 			...getMicrosoftConfiguration(),

@@ -60,6 +60,8 @@ export interface OdspConnectionConfig {
 
 export const tokenMap: Map<string, string> = new Map();
 
+export const containerMap: Map<string, string> = new Map();
+
 /**
  * OdspContainerServices is returned by the OdspClient alongside a FluidContainer. It holds the
  * functionality specifically tied to the ODSP service, and how the data stored in the
