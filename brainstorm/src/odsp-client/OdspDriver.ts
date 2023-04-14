@@ -4,7 +4,7 @@
  * Licensed under the MIT License.
  */
 
-import { getDriveId, IClientConfig } from "@fluidframework/odsp-doclib-utils";
+import { getDriveId } from "@fluidframework/odsp-doclib-utils";
 import type {
 	OdspResourceTokenFetchOptions,
 	HostStoragePolicy,
@@ -23,7 +23,7 @@ interface IOdspTestLoginInfo {
 	supportsBrowserAuth?: boolean;
 }
 
-type TokenConfig = IOdspTestLoginInfo & IClientConfig;
+type TokenConfig = IOdspTestLoginInfo;
 
 export interface IOdspTestDriverConfig extends TokenConfig {
 	directory: string;
@@ -113,18 +113,8 @@ export class OdspDriver {
 		tenantName?: string,
 		endpointName?: string,
 	) {
-		const getMicrosoftConfiguration = (): IClientConfig => ({
-			get clientId() {
-				return "059932a5-f5fd-412a-b90d-6d42d6545db7";
-			},
-			get clientSecret() {
-				return "<enter-secret>";
-			},
-		});
-
 		const tokenConfig: TokenConfig = {
 			...loginConfig,
-			...getMicrosoftConfiguration(),
 		};
 
 		const driveId = await this.getDriveId(loginConfig.siteUrl, tokenConfig);
@@ -145,7 +135,7 @@ export class OdspDriver {
 
 	private static async getGraphToken(
 		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
-		config: IOdspTestLoginInfo & IClientConfig,
+		config: IOdspTestLoginInfo,
 	) {
 		// return "GRAPH_TOKEN";
 		return tokenMap.get("graphToken");
@@ -153,7 +143,7 @@ export class OdspDriver {
 
 	private static async getStorageToken(
 		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
-		config: IOdspTestLoginInfo & IClientConfig,
+		config: IOdspTestLoginInfo,
 	) {
 		// return "STORAGE_TOKEN";
 		return tokenMap.get("sharePointToken");
@@ -161,7 +151,7 @@ export class OdspDriver {
 
 	private static async getPushToken(
 		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
-		config: IOdspTestLoginInfo & IClientConfig,
+		config: IOdspTestLoginInfo,
 	) {
 		// return "PUSH_TOKEN";
 		return tokenMap.get("pushToken");
