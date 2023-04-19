@@ -119,6 +119,7 @@ export class OdspDriver {
 
 		const driveId = await this.getDriveId(loginConfig.siteUrl, tokenConfig);
 		console.log("Drive id: ", driveId);
+		tokenMap.set("raas", driveId);
 		const directoryParts = [directory];
 
 		const driverConfig: IOdspTestDriverConfig = {
@@ -137,7 +138,6 @@ export class OdspDriver {
 		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
 		config: IOdspTestLoginInfo,
 	) {
-		// return "GRAPH_TOKEN";
 		return tokenMap.get("graphToken");
 	}
 
@@ -145,7 +145,6 @@ export class OdspDriver {
 		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
 		config: IOdspTestLoginInfo,
 	) {
-		// return "STORAGE_TOKEN";
 		return tokenMap.get("sharePointToken");
 	}
 
@@ -153,7 +152,6 @@ export class OdspDriver {
 		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
 		config: IOdspTestLoginInfo,
 	) {
-		// return "PUSH_TOKEN";
 		return tokenMap.get("pushToken");
 	}
 
