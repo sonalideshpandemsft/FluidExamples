@@ -17,7 +17,7 @@ const msalConfig = {
 	},
 };
 
-const graphScopes = ["Files.ReadWrite.All"];
+const graphScopes = ["FileStorageContainer.Selected"];
 
 const sharePointScopes = [
 	"https://M365x21446507.sharepoint.com/Container.Selected",

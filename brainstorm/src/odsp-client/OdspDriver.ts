@@ -4,7 +4,6 @@
  * Licensed under the MIT License.
  */
 
-import { getDriveId } from "@fluidframework/odsp-doclib-utils";
 import type {
 	OdspResourceTokenFetchOptions,
 	HostStoragePolicy,
@@ -50,13 +49,7 @@ export class OdspDriver {
 	private static readonly driveIdPCache = new Map<string, Promise<string>>();
 
 	private static async getDriveIdFromConfig(tokenConfig: TokenConfig): Promise<string> {
-		const siteUrl = `${tokenConfig.siteUrl}`;
-		return getDriveId(siteUrl, "", undefined, {
-			accessToken: (await this.getStorageToken(
-				{ siteUrl, refresh: false },
-				tokenConfig,
-			)) as any,
-		});
+		return "RAAS_DRIVE_ID";
 	}
 	public static async createFromEnv(
 		config: {

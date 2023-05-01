@@ -22,7 +22,7 @@ const initDriver = async () => {
 
 	const driver: OdspDriver = await OdspDriver.createFromEnv({
 		username: userName,
-		directory: "OdspFluidHelloWorld",
+		directory: "Sonali-Brainstorm-1",
 		supportsBrowserAuth: true,
 		odspEndpointName: "odsp",
 	});
