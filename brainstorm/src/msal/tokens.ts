@@ -12,7 +12,7 @@ import { tokenMap } from "../odsp-client";
 
 const msalConfig = {
 	auth: {
-		clientId: "059932a5-f5fd-412a-b90d-6d42d6545db7",
+		clientId: "<YOUR-CLIENT-ID>",
 		authority: "https://login.microsoftonline.com/common/",
 	},
 };
@@ -20,8 +20,8 @@ const msalConfig = {
 const graphScopes = ["FileStorageContainer.Selected"];
 
 const sharePointScopes = [
-	"https://M365x21446507.sharepoint.com/Container.Selected",
-	"https://M365x21446507.sharepoint.com/AllSites.Write",
+	"https://<YOUR-TENANT-ID>.sharepoint.com/Container.Selected",
+	"https://<YOUR-TENANT-ID>.sharepoint.com/AllSites.Write",
 ];
 
 const pushScopes = ["offline_access", "https://pushchannel.1drv.ms/PushChannel.ReadWrite.All"];
