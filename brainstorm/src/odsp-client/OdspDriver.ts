@@ -127,27 +127,6 @@ export class OdspDriver {
 		return new OdspDriver(driverConfig, api, tenantName, endpointName);
 	}
 
-	private static async getGraphToken(
-		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
-		config: IOdspTestLoginInfo,
-	) {
-		return tokenMap.get("graphToken");
-	}
-
-	private static async getStorageToken(
-		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
-		config: IOdspTestLoginInfo,
-	) {
-		return tokenMap.get("sharePointToken");
-	}
-
-	private static async getPushToken(
-		options: OdspResourceTokenFetchOptions & { useBrowserAuth?: boolean },
-		config: IOdspTestLoginInfo,
-	) {
-		return tokenMap.get("pushToken");
-	}
-
 	public get siteUrl(): string {
 		return `${this.config.siteUrl}`;
 	}
@@ -169,12 +148,12 @@ export class OdspDriver {
 	}
 
 	public readonly getStorageToken = async (options: OdspResourceTokenFetchOptions) => {
-		return OdspDriver.getStorageToken(options, this.config);
+		return tokenMap.get("sharePointToken");
 	};
 	public readonly getPushToken = async (options: OdspResourceTokenFetchOptions) => {
-		return OdspDriver.getPushToken(options, this.config);
+		return tokenMap.get("pushToken");
 	};
 	public readonly getGraphToken = async (options: OdspResourceTokenFetchOptions) => {
-		return OdspDriver.getGraphToken(options, this.config);
+		return tokenMap.get("graphToken");
 	};
 }

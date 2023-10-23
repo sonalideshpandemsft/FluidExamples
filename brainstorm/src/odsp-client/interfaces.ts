@@ -9,40 +9,25 @@ import {
 	TokenFetcher,
 	OdspResourceTokenFetchOptions,
 } from "@fluidframework/odsp-driver-definitions";
-
-export interface IDriveInfo {
-	siteUrl: string;
-	driveId: string;
-}
-
-/**
- * OdspContainerConfig holds the common properties necessary for creating and loading containers.
- * This includes values that are set on creation but can also potentially be changed based on the
- * developer's interaction with the FluidContainer.
- */
-export interface OdspContainerConfig {
-	sharedConfig?: {
-		sharedScope: "organization" | "anonymous";
-	};
-	logger?: ITelemetryBaseLogger;
-}
+import { ITokenProvider } from "@fluidframework/routerlicious-driver";
 
 /**
  * OdspCreateContainerConfig defines the file metadata that will be applied for the newly created
  * ".f" file on SP that holds the data backing the container.
  */
-export interface OdspCreateContainerConfig extends OdspContainerConfig {
+export interface OdspCreateContainerConfig {
 	siteUrl: string;
 	driveId: string;
 	folderName: string;
 	fileName: string;
+	logger?: ITelemetryBaseLogger;
 }
 
 /**
  * OdspGetContainerConfig consists of the information necessary to fetch the file holding the
  * existing container's data.
  */
-export interface OdspGetContainerConfig extends OdspContainerConfig {
+export interface OdspGetContainerConfig {
 	fileUrl: string;
 }
 
@@ -58,9 +43,53 @@ export interface OdspConnectionConfig {
 	getMicrosoftGraphToken?: string;
 }
 
-export const tokenMap: Map<string, string> = new Map();
+export interface OdspConnectionConfig1 {
+	/**
+	 * URI to the Azure Fluid Relay service discovery endpoint.
+	 */
 
-export const containerMap: Map<string, string> = new Map();
+	endpoint: string;
+
+	/**
+	 * Instance that provides AAD endpoint tokens for Push and SharePoint
+	 */
+
+	tokenProvider: ITokenProvider;
+
+	/**
+	 * Unique tenant identifier.
+	 */
+
+	tenantName: string;
+
+	/**
+	 * RaaS Drive id in the tenant where Fluid containers are created
+	 */
+	driveId: string;
+}
+
+export interface OdspClientProps {
+	/**
+	 * Configuration for establishing a connection with the ODSP Fluid Service (Push).
+	 */
+
+	readonly connection: OdspConnectionConfig;
+
+	/**
+	 * Optional. A logger instance to receive diagnostic messages.
+	 */
+
+	readonly logger?: ITelemetryBaseLogger;
+
+	/**
+	 * Base interface for providing configurations to control experimental features. If unsure, leave this undefined.
+	 */
+	readonly configProvider?: IConfigProviderBase;
+
+	readonly summaryCompression?: boolean | ICompressionStorageConfig;
+}
+
+export const tokenMap: Map<string, string> = new Map();
 
 /**
  * OdspContainerServices is returned by the OdspClient alongside a FluidContainer. It holds the

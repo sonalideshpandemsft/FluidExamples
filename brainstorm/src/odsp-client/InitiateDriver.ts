@@ -9,16 +9,8 @@ import { OdspClient } from "./OdspClient";
 import { OdspDriver } from "./OdspDriver";
 
 const initDriver = async () => {
-	console.log("Driver init------");
 
 	const { graphToken, sharePointToken, pushToken, userName, siteUrl } = await getTokens();
-	console.log(
-		"tokens-------------------" + graphToken,
-		sharePointToken,
-		pushToken,
-		userName,
-		siteUrl,
-	);
 
 	const driver: OdspDriver = await OdspDriver.createFromEnv({
 		username: userName,
@@ -26,7 +18,7 @@ const initDriver = async () => {
 		supportsBrowserAuth: true,
 		odspEndpointName: "odsp",
 	});
-	console.log("Driver------", driver);
+
 	const connectionConfig: OdspConnectionConfig = {
 		getSharePointToken: driver.getStorageToken as any,
 		getPushServiceToken: driver.getPushToken as any,
