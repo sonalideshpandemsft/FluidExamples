@@ -9,7 +9,6 @@ import { OdspClient } from "./OdspClient";
 import { OdspDriver } from "./OdspDriver";
 
 const initDriver = async () => {
-
 	const { graphToken, sharePointToken, pushToken, userName, siteUrl } = await getTokens();
 
 	const driver: OdspDriver = await OdspDriver.createFromEnv({

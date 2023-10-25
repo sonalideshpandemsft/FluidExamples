@@ -12,73 +12,64 @@ import {
 import { ITokenProvider } from "@fluidframework/routerlicious-driver";
 
 /**
- * OdspCreateContainerConfig defines the file metadata that will be applied for the newly created
- * ".f" file on SP that holds the data backing the container.
- */
-export interface OdspCreateContainerConfig {
-	siteUrl: string;
-	driveId: string;
-	folderName: string;
-	fileName: string;
-	logger?: ITelemetryBaseLogger;
-}
-
-/**
- * OdspGetContainerConfig consists of the information necessary to fetch the file holding the
- * existing container's data.
- */
-export interface OdspGetContainerConfig {
-	fileUrl: string;
-}
-
-/**
  * OdspConnectionConfig defines the necessary properties that will be applied to all containers
  * created by an OdspClient instance. This includes callbacks for the authentication tokens
  * required for ODSP. Graph token is optional as it is only required for creating share links.
  */
 export interface OdspConnectionConfig {
+	/**
+	 * URI to the Azure Fluid Relay service discovery endpoint.
+	 * ASK: THIS IS THE siteURL?
+	 */
+	endpoint: string;
+
+	/**
+	 * Instance that provides AAD endpoint tokens for Push and SharePoint
+	 * ASK: CONVERT TO TokenFetcher<OdspResourceTokenFetchOptions> ONCE RECEIVED
+	 */
+	tokenProvider: ITokenProvider;
+
+	getSharePointToken: TokenFetcher<OdspResourceTokenFetchOptions>;
+
+	getPushServiceToken: TokenFetcher<OdspResourceTokenFetchOptions>;
+
+	/**
+	 * Unique tenant identifier.
+	 */
+	tenantId: string;
+
+	/**
+	 * RaaS Drive Id in the tenant where Fluid containers are created
+	 */
+	driveId: string;
+
+	/**
+	 * ASK: THIS SHOULD BE PASSED. WHY IS THIS NOT PASSED?
+	 */
+	folderName: string;
+
+	/**
+	 * ASK: THIS SHOULD BE PASSED. WHY IS THIS NOT PASSED?
+	 */
+	fileName: string;
+}
+
+export interface OdspConnectionConfig1 {
 	getSharePointToken: TokenFetcher<OdspResourceTokenFetchOptions>;
 	getPushServiceToken: TokenFetcher<OdspResourceTokenFetchOptions>;
 	getGraphToken?: TokenFetcher<OdspResourceTokenFetchOptions>;
 	getMicrosoftGraphToken?: string;
 }
 
-export interface OdspConnectionConfig1 {
-	/**
-	 * URI to the Azure Fluid Relay service discovery endpoint.
-	 */
-
-	endpoint: string;
-
-	/**
-	 * Instance that provides AAD endpoint tokens for Push and SharePoint
-	 */
-
-	tokenProvider: ITokenProvider;
-
-	/**
-	 * Unique tenant identifier.
-	 */
-
-	tenantName: string;
-
-	/**
-	 * RaaS Drive id in the tenant where Fluid containers are created
-	 */
-	driveId: string;
-}
-
 export interface OdspClientProps {
 	/**
 	 * Configuration for establishing a connection with the ODSP Fluid Service (Push).
 	 */
-
 	readonly connection: OdspConnectionConfig;
 
 	/**
 	 * Optional. A logger instance to receive diagnostic messages.
 	 */
-
 	readonly logger?: ITelemetryBaseLogger;
 
 	/**
@@ -104,7 +95,7 @@ export interface OdspContainerServices {
 	 * this container was created with. If it was shared, this will create a new share link according
 	 * to the scope defined on the config. Otherwise, it will return a direct file link.
 	 */
-	generateLink: () => Promise<string>;
+	// generateLink: () => Promise<string>;
 
 	/**
 	 * Provides an object that can be used to get the users that are present in this Fluid session and
