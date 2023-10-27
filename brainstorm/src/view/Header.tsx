@@ -6,7 +6,6 @@ import { DefaultColor } from "./Color";
 import { ColorPicker } from "./ColorPicker";
 import { NoteData } from "../Types";
 import { NOTE_SIZE } from "./Note.style";
-import { tokenMap } from "../odsp-client";
 
 function uuidv4() {
 	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -106,14 +105,7 @@ export function Header(props: HeaderProps) {
 						justifyContent: "center",
 						alignItems: "center",
 					}}
-				>
-					<span style={{ color: "green", marginRight: "8px" }}>&#10004;</span>
-					<span>
-						{tokenMap.get("raas")
-							? `RaaS storage model: ${tokenMap.get("raas")}` // Highlighted expression
-							: `Reload the app. Storage layer is not RaaS`}
-					</span>
-				</div>
+				></div>
 			),
 		},
 	];

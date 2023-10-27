@@ -12,17 +12,14 @@ import { tokenMap } from "../odsp-client";
 
 const msalConfig = {
 	auth: {
-		clientId: "<YOUR-CLIENT-ID>",
+		clientId: "<APP-ID>",
 		authority: "https://login.microsoftonline.com/common/",
 	},
 };
 
 const graphScopes = ["FileStorageContainer.Selected"];
 
-const sharePointScopes = [
-	"https://<YOUR-TENANT-ID>.sharepoint.com/Container.Selected",
-	"https://<YOUR-TENANT-ID>.sharepoint.com/AllSites.Write",
-];
+const sharePointScopes = ["https://<TENANT-NAME>.sharepoint.com/Container.Selected"];
 
 const pushScopes = ["offline_access", "https://pushchannel.1drv.ms/PushChannel.ReadWrite.All"];
 
@@ -30,19 +27,10 @@ const msalInstance = new PublicClientApplication(msalConfig);
 
 export async function getTokens(): Promise<{
 	graphToken: string;
-	sharePointToken: string;
-	pushToken: string;
-	userName: string;
-	siteUrl: string;
 }> {
 	const response = await msalInstance.loginPopup({ scopes: graphScopes });
 
 	msalInstance.setActiveAccount(response.account);
-	const username = response.account?.username as string;
-	const startIndex = username.indexOf("@") + 1;
-	const endIndex = username.indexOf(".");
-	const tenantName = username.substring(startIndex, endIndex);
-	const siteUrl = `https://${tenantName}.sharepoint.com`;
 
 	try {
 		// Attempt to acquire SharePoint token silently
@@ -61,19 +49,12 @@ export async function getTokens(): Promise<{
 			otherRequest,
 		);
 
-		tokenMap.set("graphToken", response.accessToken);
 		tokenMap.set("sharePointToken", sharePointTokenResult.accessToken);
 		tokenMap.set("pushToken", pushTokenResult.accessToken);
-		tokenMap.set("userName", username);
-		tokenMap.set("siteUrl", siteUrl);
 
 		// Return both tokens
 		return {
 			graphToken: response.accessToken,
-			sharePointToken: sharePointTokenResult.accessToken,
-			pushToken: pushTokenResult.accessToken,
-			userName: response.account?.username as string,
-			siteUrl: siteUrl,
 		};
 	} catch (error) {
 		if (error instanceof InteractionRequiredAuthError) {
@@ -91,19 +72,12 @@ export async function getTokens(): Promise<{
 				otherRequest,
 			);
 
-			tokenMap.set("graphToken", response.accessToken);
 			tokenMap.set("sharePointToken", sharePointTokenResult.accessToken);
 			tokenMap.set("pushToken", pushTokenResult.accessToken);
-			tokenMap.set("userName", username);
-			tokenMap.set("siteUrl", siteUrl);
 
 			// Return both tokens
 			return {
 				graphToken: response.accessToken,
-				sharePointToken: sharePointTokenResult.accessToken,
-				pushToken: pushTokenResult.accessToken,
-				userName: response.account?.username as string,
-				siteUrl: siteUrl,
 			};
 		} else {
 			// Handle any other error

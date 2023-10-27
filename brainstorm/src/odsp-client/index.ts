@@ -5,8 +5,6 @@
 
 export * from "./OdspAudience";
 export * from "./OdspClient";
-export * from "./OdspDriver";
 export * from "./OdspInstance";
 export * from "./interfaces";
-export * from "./odspUtils";
-export * from "./InitiateDriver";
+export * from "./OdspConfig";

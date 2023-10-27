@@ -19,31 +19,12 @@ import {
 	OdspGetContainerConfig,
 } from "./odsp-client/interfaces";
 import { OdspClient } from "./odsp-client/OdspClient";
-import { getodspDriver } from "./odsp-client";
-
-const documentId = uuid();
-
-const containerPath = (url: string) => {
-	const itemIdPattern = /itemId=([^&]+)/; // regular expression to match the itemId parameter value
-	let itemId;
-
-	const match = url.match(itemIdPattern); // get the match object for the itemId parameter value
-	if (match) {
-		itemId = match[1]; // extract the itemId parameter value from the match object
-		console.log(itemId); // output: "itemidQ"
-	} else {
-		console.log("itemId parameter not found in the URL");
-		itemId = "";
-	}
-	return itemId;
-};
+import { odspConfig } from "./odsp-client";
 
 export async function start() {
 	initializeIcons();
 
-	console.log("Initiating the driver------");
-	const odspDriver = await getodspDriver();
-	console.log("INITIAL DRIVER", odspDriver);
+	const odspDriver = await odspConfig();
 
 	const getContainerId = (): { containerId: string; isNew: boolean } => {
 		let isNew = false;
@@ -65,10 +46,10 @@ export async function start() {
 	if (isNew) {
 		console.log("CREATING THE CONTAINER");
 		const containerConfig: OdspCreateContainerConfig = {
-			siteUrl: odspDriver.siteUrl,
-			driveId: odspDriver.driveId,
-			folderName: odspDriver.directory,
-			fileName: documentId,
+			siteUrl: odspDriver.connection.siteUrl,
+			driveId: odspDriver.connection.driveId,
+			folderName: "",
+			fileName: uuid(),
 		};
 
 		console.log("CONTAINER CONFIG", containerConfig);
@@ -80,11 +61,11 @@ export async function start() {
 		container = fluidContainer;
 		services = containerServices;
 
-		const sharingLink = await containerServices.generateLink();
-		const itemId = containerPath(sharingLink);
-		localStorage.setItem(itemId, sharingLink);
+		const url = await containerServices.getSharingUrl();
+		const containerId = await containerServices.getContainerId();
+		localStorage.setItem(containerId, url);
 		console.log("CONTAINER CREATED");
-		location.hash = itemId;
+		location.hash = containerId;
 	} else {
 		const containerConfig: OdspGetContainerConfig = {
 			fileUrl: containerId, //pass file url

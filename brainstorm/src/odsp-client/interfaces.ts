@@ -10,11 +10,6 @@ import {
 	OdspResourceTokenFetchOptions,
 } from "@fluidframework/odsp-driver-definitions";
 
-export interface IDriveInfo {
-	siteUrl: string;
-	driveId: string;
-}
-
 /**
  * OdspContainerConfig holds the common properties necessary for creating and loading containers.
  * This includes values that are set on creation but can also potentially be changed based on the
@@ -52,15 +47,45 @@ export interface OdspGetContainerConfig extends OdspContainerConfig {
  * required for ODSP. Graph token is optional as it is only required for creating share links.
  */
 export interface OdspConnectionConfig {
+	/**
+	 * Site url representing ODSP resource location
+	 */
+	siteUrl: string;
+
+	/**
+	 * Instance that provides AAD endpoint tokens for Push and SharePoint
+	 */
+	// tokenProvider: ITokenProvider;
+
 	getSharePointToken: TokenFetcher<OdspResourceTokenFetchOptions>;
 	getPushServiceToken: TokenFetcher<OdspResourceTokenFetchOptions>;
-	getGraphToken?: TokenFetcher<OdspResourceTokenFetchOptions>;
-	getMicrosoftGraphToken?: string;
+
+	/**
+	 * RaaS Drive Id of the tenant where Fluid containers are created
+	 */
+	driveId: string;
+}
+
+export interface OdspClientProps {
+	/**
+	 * Configuration for establishing a connection with the ODSP Fluid Service (Push).
+	 */
+	readonly connection: OdspConnectionConfig;
+
+	/**
+	 * Optional. A logger instance to receive diagnostic messages.
+	 */
+	readonly logger?: ITelemetryBaseLogger;
+
+	/**
+	 * Base interface for providing configurations to control experimental features. If unsure, leave this undefined.
+	 */
+	// readonly configProvider?: IConfigProviderBase;
+
+	// readonly summaryCompression?: boolean | ICompressionStorageConfig;
 }
 
 export const tokenMap: Map<string, string> = new Map();
-
-export const containerMap: Map<string, string> = new Map();
 
 /**
  * OdspContainerServices is returned by the OdspClient alongside a FluidContainer. It holds the
@@ -75,7 +100,11 @@ export interface OdspContainerServices {
 	 * this container was created with. If it was shared, this will create a new share link according
 	 * to the scope defined on the config. Otherwise, it will return a direct file link.
 	 */
-	generateLink: () => Promise<string>;
+	getSharingUrl: () => Promise<string>;
+
+	getItemId: () => Promise<string>;
+
+	getContainerId: () => Promise<string>;
 
 	/**
 	 * Provides an object that can be used to get the users that are present in this Fluid session and

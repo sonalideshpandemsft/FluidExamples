@@ -7,8 +7,8 @@ import { ContainerSchema } from "@fluidframework/fluid-static";
 import {
 	OdspCreateContainerConfig,
 	OdspGetContainerConfig,
-	OdspConnectionConfig,
 	OdspResources,
+	OdspClientProps,
 } from "./interfaces";
 import { OdspInstance } from "./OdspInstance";
 
@@ -20,11 +20,11 @@ export class OdspClient {
 	// eslint-disable-line @typescript-eslint/no-extraneous-class
 	private static globalInstance: OdspInstance | undefined;
 
-	static init(config: OdspConnectionConfig, server: string) {
+	static init(config: OdspClientProps) {
 		if (OdspClient.globalInstance) {
 			throw new Error("OdspClient cannot be initialized more than once");
 		}
-		OdspClient.globalInstance = new OdspInstance(config, server);
+		OdspClient.globalInstance = new OdspInstance(config);
 	}
 
 	static async createContainer(
