@@ -9,7 +9,7 @@ import { OdspClientProps, OdspConnectionConfig } from "./interfaces";
 const connectionConfig: OdspConnectionConfig = {
 	tokenProvider: new OdspTokenConfig(),
 	siteUrl: "<SITE_URL>",
-	driveId: "<DRIVE_ID>",
+	driveId: "<RAAS_DRIVE_ID>",
 };
 
 export const odspProps: OdspClientProps = {

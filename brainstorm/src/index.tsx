@@ -53,6 +53,7 @@ export async function start() {
 		console.log("CONTAINER CREATED");
 		location.hash = containerId;
 	} else {
+		console.log("GET CONTAINER");
 		({ container, services } = await client.getContainer(containerId, containerSchema));
 	}
 

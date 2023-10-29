@@ -151,8 +151,7 @@ export class OdspClient {
 			return resolvedUrl.id;
 		};
 		const fluidContainer = new FluidContainer(container, rootDataObject);
-		const id = await attach();
-		console.log("Container id ", id);
+		await attach();
 		fluidContainer.attach = attach;
 		return fluidContainer;
 	}

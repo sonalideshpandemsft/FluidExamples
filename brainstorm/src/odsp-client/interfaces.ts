@@ -10,7 +10,7 @@ import { ITokenProvider } from "@fluidframework/azure-client";
 /**
  * OdspConnectionConfig defines the necessary properties that will be applied to all containers
  * created by an OdspClient instance. This includes callbacks for the authentication tokens
- * required for ODSP. Graph token is optional as it is only required for creating share links.
+ * required for ODSP.
  */
 export interface OdspConnectionConfig {
 	/**
