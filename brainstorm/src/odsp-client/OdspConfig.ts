@@ -3,34 +3,15 @@
  * Licensed under the MIT License.
  */
 
-import { getTokens } from "../msal/tokens";
-import { OdspClientProps, OdspConnectionConfig, tokenMap } from "./interfaces";
-import { OdspClient } from "./OdspClient";
+import { OdspTokenConfig } from "../msal/OdspTokenConfig";
+import { OdspClientProps, OdspConnectionConfig } from "./interfaces";
 
-export const odspConfig = async () => {
-	console.log("Authenticating------");
+const connectionConfig: OdspConnectionConfig = {
+	tokenProvider: new OdspTokenConfig(),
+	siteUrl: "<SITE_URL>",
+	driveId: "<DRIVE_ID>",
+};
 
-	await getTokens();
-
-	const getStorageToken = async () => {
-		return tokenMap.get("sharePointToken");
-	};
-
-	const getPushToken = async () => {
-		return tokenMap.get("pushToken");
-	};
-
-	const connectionConfig: OdspConnectionConfig = {
-		getSharePointToken: getStorageToken as any,
-		getPushServiceToken: getPushToken as any,
-		siteUrl: "<SITE_URL>",
-		driveId: "<DRIVE_ID>",
-	};
-
-	const conn: OdspClientProps = {
-		connection: connectionConfig,
-	};
-
-	OdspClient.init(conn);
-	return conn;
+export const odspProps: OdspClientProps = {
+	connection: connectionConfig,
 };

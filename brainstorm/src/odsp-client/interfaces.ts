@@ -3,43 +3,9 @@
  * Licensed under the MIT License.
  */
 
-import { FluidContainer, IMember, IServiceAudience } from "@fluidframework/fluid-static";
+import { IMember, IServiceAudience } from "@fluidframework/fluid-static";
 import { ITelemetryBaseLogger } from "@fluidframework/common-definitions";
-import {
-	TokenFetcher,
-	OdspResourceTokenFetchOptions,
-} from "@fluidframework/odsp-driver-definitions";
-
-/**
- * OdspContainerConfig holds the common properties necessary for creating and loading containers.
- * This includes values that are set on creation but can also potentially be changed based on the
- * developer's interaction with the FluidContainer.
- */
-export interface OdspContainerConfig {
-	sharedConfig?: {
-		sharedScope: "organization" | "anonymous";
-	};
-	logger?: ITelemetryBaseLogger;
-}
-
-/**
- * OdspCreateContainerConfig defines the file metadata that will be applied for the newly created
- * ".f" file on SP that holds the data backing the container.
- */
-export interface OdspCreateContainerConfig extends OdspContainerConfig {
-	siteUrl: string;
-	driveId: string;
-	folderName: string;
-	fileName: string;
-}
-
-/**
- * OdspGetContainerConfig consists of the information necessary to fetch the file holding the
- * existing container's data.
- */
-export interface OdspGetContainerConfig extends OdspContainerConfig {
-	fileUrl: string;
-}
+import { ITokenProvider } from "@fluidframework/azure-client";
 
 /**
  * OdspConnectionConfig defines the necessary properties that will be applied to all containers
@@ -55,10 +21,7 @@ export interface OdspConnectionConfig {
 	/**
 	 * Instance that provides AAD endpoint tokens for Push and SharePoint
 	 */
-	// tokenProvider: ITokenProvider;
-
-	getSharePointToken: TokenFetcher<OdspResourceTokenFetchOptions>;
-	getPushServiceToken: TokenFetcher<OdspResourceTokenFetchOptions>;
+	tokenProvider: ITokenProvider;
 
 	/**
 	 * RaaS Drive Id of the tenant where Fluid containers are created
@@ -116,11 +79,6 @@ export interface OdspContainerServices {
 export interface OdspMember extends IMember {
 	userName: string;
 	email: string;
-}
-
-export interface OdspResources {
-	fluidContainer: FluidContainer;
-	containerServices: OdspContainerServices;
 }
 
 export type IOdspAudience = IServiceAudience<OdspMember>;

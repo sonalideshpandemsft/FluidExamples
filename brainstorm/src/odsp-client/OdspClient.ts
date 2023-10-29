@@ -1,54 +1,182 @@
-/*!
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
-import { ContainerSchema } from "@fluidframework/fluid-static";
+import { IDocumentServiceFactory } from "@fluidframework/driver-definitions";
 import {
-	OdspCreateContainerConfig,
-	OdspGetContainerConfig,
-	OdspResources,
-	OdspClientProps,
-} from "./interfaces";
-import { OdspInstance } from "./OdspInstance";
+	OdspDocumentServiceFactory,
+	OdspDriverUrlResolver,
+	createOdspCreateContainerRequest,
+} from "@fluidframework/odsp-driver";
+import { OdspClientProps, OdspConnectionConfig, OdspContainerServices } from "./interfaces";
+import {
+	type ContainerSchema,
+	DOProviderContainerRuntimeFactory,
+	IFluidContainer,
+	FluidContainer,
+} from "@fluidframework/fluid-static";
+import {
+	AttachState,
+	IContainer,
+	IFluidModuleWithDetails,
+} from "@fluidframework/container-definitions";
+import { IClient } from "@fluidframework/protocol-definitions";
+import { Loader } from "@fluidframework/container-loader";
+import { v4 as uuid } from "uuid";
+import {
+	IOdspResolvedUrl,
+	OdspResourceTokenFetchOptions,
+} from "@fluidframework/odsp-driver-definitions";
+import { OdspAudience } from "./OdspAudience";
+import { ITokenResponse } from "@fluidframework/azure-client";
 
-/**
- * OdspClient static class with singular global instance that lets the developer define all Container
- * interactions with the ODSP service
- */
 export class OdspClient {
-	// eslint-disable-line @typescript-eslint/no-extraneous-class
-	private static globalInstance: OdspInstance | undefined;
+	private documentServiceFactory: IDocumentServiceFactory;
+	private urlResolver: OdspDriverUrlResolver;
 
-	static init(config: OdspClientProps) {
-		if (OdspClient.globalInstance) {
-			throw new Error("OdspClient cannot be initialized more than once");
-		}
-		OdspClient.globalInstance = new OdspInstance(config);
+	public constructor(private readonly properties: OdspClientProps) {
+		const getSharePointToken = async (options: OdspResourceTokenFetchOptions) => {
+			const tokenResponse: ITokenResponse =
+				await this.properties.connection.tokenProvider.fetchStorageToken(
+					options.siteUrl,
+					"",
+				);
+			return {
+				token: tokenResponse.jwt,
+			};
+		};
+
+		const getPushServiceToken = async (options: OdspResourceTokenFetchOptions) => {
+			const tokenResponse: ITokenResponse =
+				await this.properties.connection.tokenProvider.fetchOrdererToken(options.siteUrl);
+			return {
+				token: tokenResponse.jwt,
+			};
+		};
+		this.documentServiceFactory = new OdspDocumentServiceFactory(
+			getSharePointToken,
+			getPushServiceToken,
+		);
+
+		this.urlResolver = new OdspDriverUrlResolver();
 	}
 
-	static async createContainer(
-		containerConfig: OdspCreateContainerConfig,
-		containerSchema: ContainerSchema,
-	): Promise<OdspResources> {
-		if (!OdspClient.globalInstance) {
-			throw new Error(
-				"OdspClient has not been properly initialized before attempting to create a container",
-			);
-		}
-		return OdspClient.globalInstance.createContainer(containerConfig, containerSchema);
+	public async createContainer(containerSchema: ContainerSchema): Promise<{
+		container: IFluidContainer;
+		services: OdspContainerServices;
+	}> {
+		const loader = this.createLoader(containerSchema);
+
+		const container = await loader.createDetachedContainer({
+			package: "no-dynamic-package",
+			config: {},
+		});
+
+		const fluidContainer = await this.createFluidContainer(
+			container,
+			this.properties.connection,
+		);
+
+		const services = await this.getContainerServices(container);
+
+		return { container: fluidContainer, services };
 	}
 
-	static async getContainer(
-		containerConfig: OdspGetContainerConfig,
+	public async getContainer(
+		sharingUrl: string,
 		containerSchema: ContainerSchema,
-	): Promise<OdspResources> {
-		console.log("get container");
-		if (!OdspClient.globalInstance) {
-			throw new Error(
-				"OdspClient has not been properly initialized before attempting to get a container",
-			);
+	): Promise<{
+		container: IFluidContainer;
+		services: OdspContainerServices;
+	}> {
+		const loader = this.createLoader(containerSchema);
+		const container = await loader.resolve({ url: sharingUrl });
+
+		const rootDataObject = (await container.request({ url: "/" })).value;
+		const fluidContainer = new FluidContainer(container, rootDataObject);
+		const services = await this.getContainerServices(container);
+		return { container: fluidContainer, services };
+	}
+
+	private createLoader(containerSchema: ContainerSchema): Loader {
+		const runtimeFactory = new DOProviderContainerRuntimeFactory(containerSchema);
+		const load = async (): Promise<IFluidModuleWithDetails> => {
+			return {
+				module: { fluidExport: runtimeFactory },
+				details: { package: "no-dynamic-package", config: {} },
+			};
+		};
+
+		const codeLoader = { load };
+		const client: IClient = {
+			details: {
+				capabilities: { interactive: true },
+			},
+			permission: [],
+			scopes: [],
+			user: { id: "" },
+			mode: "write",
+		};
+
+		return new Loader({
+			urlResolver: this.urlResolver,
+			documentServiceFactory: this.documentServiceFactory,
+			codeLoader,
+			logger: this.properties.logger,
+			options: { client },
+		});
+	}
+
+	private async createFluidContainer(
+		container: IContainer,
+		connection: OdspConnectionConfig,
+	): Promise<IFluidContainer> {
+		const createNewRequest = createOdspCreateContainerRequest(
+			connection.siteUrl,
+			connection.driveId,
+			"",
+			uuid(),
+		);
+
+		const rootDataObject = (await container.request({ url: "/" })).value;
+
+		/**
+		 * See {@link FluidContainer.attach}
+		 */
+		const attach = async (): Promise<string> => {
+			if (container.attachState !== AttachState.Detached) {
+				throw new Error("Cannot attach container. Container is not in detached state");
+			}
+			await container.attach(createNewRequest);
+			const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
+			if (container.resolvedUrl === undefined) {
+				throw new Error("Resolved Url not available on attached container");
+			}
+			return resolvedUrl.id;
+		};
+		const fluidContainer = new FluidContainer(container, rootDataObject);
+		const id = await attach();
+		console.log("Container id ", id);
+		fluidContainer.attach = attach;
+		return fluidContainer;
+	}
+
+	private async getContainerServices(container: IContainer): Promise<OdspContainerServices> {
+		const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
+		if (resolvedUrl === undefined) {
+			throw new Error("Resolved Url not available on attached container");
 		}
-		return OdspClient.globalInstance.getContainer(containerConfig, containerSchema);
+		return {
+			getSharingUrl: async () => {
+				const url = await container.getAbsoluteUrl("/");
+				if (url === undefined) {
+					throw new Error("container has no url");
+				}
+				return url;
+			},
+			getItemId: async () => {
+				return resolvedUrl.itemId;
+			},
+			getContainerId: async () => {
+				return resolvedUrl.id;
+			},
+			audience: new OdspAudience(container),
+		};
 	}
 }

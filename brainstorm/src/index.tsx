@@ -2,10 +2,8 @@
  * Copyright (c) Microsoft Corporation and contributors. All rights reserved.
  * Licensed under the MIT License.
  */
-
-import { v4 as uuid } from "uuid";
 import { initializeIcons, ThemeProvider } from "@fluentui/react";
-import { ConnectionState, FluidContainer } from "fluid-framework";
+import { IFluidContainer } from "@fluidframework/fluid-static";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrainstormView } from "./view/BrainstormView";
@@ -13,71 +11,49 @@ import "./view/index.css";
 import "./view/App.css";
 import { themeNameToTheme } from "./view/Themes";
 import { containerSchema } from "./Config";
-import {
-	OdspContainerServices,
-	OdspCreateContainerConfig,
-	OdspGetContainerConfig,
-} from "./odsp-client/interfaces";
+import { OdspContainerServices } from "./odsp-client/interfaces";
 import { OdspClient } from "./odsp-client/OdspClient";
-import { odspConfig } from "./odsp-client";
+import { ConnectionState } from "fluid-framework";
+import { getTokens } from "./msal/tokens";
+import { odspProps } from "./odsp-client";
 
 export async function start() {
 	initializeIcons();
 
-	const odspDriver = await odspConfig();
+	await getTokens();
+
+	console.log("-----TOKENS GENERATED----");
+
+	const client = new OdspClient(odspProps);
 
 	const getContainerId = (): { containerId: string; isNew: boolean } => {
 		let isNew = false;
-		console.log("hash: ", location.hash);
 		if (location.hash.length === 0) {
 			isNew = true;
 		}
 		const hash = location.hash;
-		const itemId = hash.charAt(0) === "#" ? hash.substring(1) : hash;
-		const containerId = localStorage.getItem(itemId) as string;
+		const absoluteUrl = hash.charAt(0) === "#" ? hash.substring(1) : hash;
+		const containerId = localStorage.getItem(absoluteUrl) as string;
 		return { containerId, isNew };
 	};
 
 	const { containerId, isNew } = getContainerId();
 
-	let container: FluidContainer;
+	let container: IFluidContainer;
 	let services: OdspContainerServices;
 
 	if (isNew) {
 		console.log("CREATING THE CONTAINER");
-		const containerConfig: OdspCreateContainerConfig = {
-			siteUrl: odspDriver.connection.siteUrl,
-			driveId: odspDriver.connection.driveId,
-			folderName: "",
-			fileName: uuid(),
-		};
 
-		console.log("CONTAINER CONFIG", containerConfig);
+		({ container, services } = await client.createContainer(containerSchema));
 
-		const { fluidContainer, containerServices } = await OdspClient.createContainer(
-			containerConfig,
-			containerSchema,
-		);
-		container = fluidContainer;
-		services = containerServices;
-
-		const url = await containerServices.getSharingUrl();
-		const containerId = await containerServices.getContainerId();
+		const url = await services.getSharingUrl();
+		const containerId = await services.getContainerId();
 		localStorage.setItem(containerId, url);
 		console.log("CONTAINER CREATED");
 		location.hash = containerId;
 	} else {
-		const containerConfig: OdspGetContainerConfig = {
-			fileUrl: containerId, //pass file url
-		};
-
-		const { fluidContainer, containerServices } = await OdspClient.getContainer(
-			containerConfig,
-			containerSchema,
-		);
-
-		container = fluidContainer;
-		services = containerServices;
+		({ container, services } = await client.getContainer(containerId, containerSchema));
 	}
 
 	if (container.connectionState !== ConnectionState.Connected) {

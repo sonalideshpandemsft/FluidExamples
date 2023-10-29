@@ -4,7 +4,6 @@
  */
 
 export * from "./OdspAudience";
-export * from "./OdspClient";
-export * from "./OdspInstance";
 export * from "./interfaces";
 export * from "./OdspConfig";
+export * from "./OdspClient";
