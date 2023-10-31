@@ -19,10 +19,7 @@ const msalConfig = {
 
 const graphScopes = ["FileStorageContainer.Selected"];
 
-const sharePointScopes = [
-	"https://M365x21446507.sharepoint.com/Container.Selected",
-	"https://M365x21446507.sharepoint.com/AllSites.Write",
-];
+const sharePointScopes = ["https://M365x21446507.sharepoint.com/Container.Selected"];
 
 const pushScopes = ["offline_access", "https://pushchannel.1drv.ms/PushChannel.ReadWrite.All"];
 
