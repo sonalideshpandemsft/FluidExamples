@@ -46,14 +46,17 @@ export async function start() {
 		console.log("CREATING THE CONTAINER");
 
 		({ container, services } = await client.createContainer(containerSchema));
-
-		const url = await services.getSharingUrl();
-		const containerId = await services.getContainerId();
-		localStorage.setItem(containerId, url);
-		console.log("CONTAINER CREATED");
-		location.hash = containerId;
+		await container.attach();
+		const attributes = await services.getTenantAttributes();
+		const url = attributes.getSharingUrl;
+		const item = attributes.getItemId;
+		if (item === undefined || url === undefined) {
+			throw new Error("Either itemId or url is undefined");
+		}
+		localStorage.setItem(item, url);
+		location.hash = item;
 	} else {
-		console.log("GET CONTAINER");
+		console.log("GET CONTAINER", containerId);
 		({ container, services } = await client.getContainer(containerId, containerSchema));
 	}
 

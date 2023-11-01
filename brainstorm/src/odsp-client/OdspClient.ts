@@ -4,7 +4,12 @@ import {
 	OdspDriverUrlResolver,
 	createOdspCreateContainerRequest,
 } from "@fluidframework/odsp-driver";
-import { OdspClientProps, OdspConnectionConfig, OdspContainerServices } from "./interfaces";
+import {
+	OdspClientProps,
+	OdspConnectionConfig,
+	OdspContainerServices,
+	OdspServiceAttributes,
+} from "./interfaces";
 import {
 	type ContainerSchema,
 	DOProviderContainerRuntimeFactory,
@@ -130,7 +135,7 @@ export class OdspClient {
 		const createNewRequest = createOdspCreateContainerRequest(
 			connection.siteUrl,
 			connection.driveId,
-			"",
+			connection.path,
 			uuid(),
 		);
 
@@ -145,36 +150,37 @@ export class OdspClient {
 			}
 			await container.attach(createNewRequest);
 			const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
+			console.log("create: ", resolvedUrl.itemId);
 			if (container.resolvedUrl === undefined) {
 				throw new Error("Resolved Url not available on attached container");
 			}
-			return resolvedUrl.id;
+			return resolvedUrl.url;
 		};
 		const fluidContainer = new FluidContainer(container, rootDataObject);
-		await attach();
 		fluidContainer.attach = attach;
 		return fluidContainer;
 	}
 
 	private async getContainerServices(container: IContainer): Promise<OdspContainerServices> {
-		const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
-		if (resolvedUrl === undefined) {
-			throw new Error("Resolved Url not available on attached container");
-		}
+		const getAttributes = async (): Promise<OdspServiceAttributes> => {
+			const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
+			if (resolvedUrl === undefined) {
+				throw new Error("Resolved Url not available on attached container");
+			}
+			const url = await container.getAbsoluteUrl("/");
+			if (url === undefined) {
+				throw new Error("Container has no absolute url");
+			}
+
+			return {
+				getSharingUrl: url,
+				getItemId: resolvedUrl.itemId,
+				getDriveId: resolvedUrl.driveId,
+			};
+		};
+
 		return {
-			getSharingUrl: async () => {
-				const url = await container.getAbsoluteUrl("/");
-				if (url === undefined) {
-					throw new Error("container has no url");
-				}
-				return url;
-			},
-			getItemId: async () => {
-				return resolvedUrl.itemId;
-			},
-			getContainerId: async () => {
-				return resolvedUrl.id;
-			},
+			getTenantAttributes: getAttributes,
 			audience: new OdspAudience(container),
 		};
 	}
