@@ -5,7 +5,7 @@
 
 import { IMember, IServiceAudience } from "@fluidframework/fluid-static";
 import { ITelemetryBaseLogger } from "@fluidframework/common-definitions";
-import { ITokenProvider } from "@fluidframework/azure-client";
+import { ITokenProvider, IUser } from "@fluidframework/azure-client";
 
 /**
  * OdspConnectionConfig defines the necessary properties that will be applied to all containers
@@ -60,7 +60,7 @@ export const tokenMap: Map<string, string> = new Map();
  * use, will not be included here but rather on the FluidContainer class itself.
  */
 export interface OdspContainerServices {
-	getTenantAttributes: () => Promise<OdspServiceAttributes>;
+	tenantAttributes: () => Promise<OdspServiceAttributes | undefined>;
 
 	/**
 	 * Provides an object that can be used to get the users that are present in this Fluid session and
@@ -78,15 +78,21 @@ export interface OdspServiceAttributes {
 	 * this container was created with. If it was shared, this will create a new share link according
 	 * to the scope defined on the config. Otherwise, it will return a direct file link.
 	 */
-	getSharingUrl: string | undefined;
+	sharingUrl: string;
 
-	getItemId: string | undefined;
-
-	getDriveId: string | undefined;
+	driveId: string;
 }
 
 export interface OdspMember extends IMember {
 	userName: string;
+	email: string;
+}
+
+export interface OdspUser extends IUser {
+	/**
+	 * The user's name
+	 */
+	name: string;
 	email: string;
 }
 

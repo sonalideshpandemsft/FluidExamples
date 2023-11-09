@@ -154,7 +154,7 @@ export class OdspClient {
 			if (container.resolvedUrl === undefined) {
 				throw new Error("Resolved Url not available on attached container");
 			}
-			return resolvedUrl.url;
+			return resolvedUrl.itemId;
 		};
 		const fluidContainer = new FluidContainer(container, rootDataObject);
 		fluidContainer.attach = attach;
@@ -173,14 +173,13 @@ export class OdspClient {
 			}
 
 			return {
-				getSharingUrl: url,
-				getItemId: resolvedUrl.itemId,
-				getDriveId: resolvedUrl.driveId,
+				sharingUrl: url,
+				driveId: resolvedUrl.driveId,
 			};
 		};
 
 		return {
-			getTenantAttributes: getAttributes,
+			tenantAttributes: getAttributes,
 			audience: new OdspAudience(container),
 		};
 	}
