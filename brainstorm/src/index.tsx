@@ -32,8 +32,7 @@ export async function start() {
 			isNew = true;
 		}
 		const hash = location.hash;
-		const absoluteUrl = hash.charAt(0) === "#" ? hash.substring(1) : hash;
-		const containerId = localStorage.getItem(absoluteUrl) as string;
+		const containerId = hash.charAt(0) === "#" ? hash.substring(1) : hash;
 		return { containerId, isNew };
 	};
 
@@ -48,16 +47,6 @@ export async function start() {
 		({ container, services } = await client.createContainer(containerSchema));
 
 		const itemId = await container.attach();
-		const attributes = await services.tenantAttributes();
-		if (attributes === undefined) {
-			throw new Error("Tenant attributes are undefined");
-		}
-		const sharingUrl = attributes.sharingUrl;
-		if (itemId === undefined || sharingUrl === undefined) {
-			throw new Error("Either itemId or url is undefined");
-		}
-
-		localStorage.setItem(itemId, sharingUrl);
 		location.hash = itemId;
 	} else {
 		console.log("GET CONTAINER", containerId);

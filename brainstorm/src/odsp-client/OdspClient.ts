@@ -4,12 +4,7 @@ import {
 	OdspDriverUrlResolver,
 	createOdspCreateContainerRequest,
 } from "@fluidframework/odsp-driver";
-import {
-	OdspClientProps,
-	OdspConnectionConfig,
-	OdspContainerServices,
-	OdspServiceAttributes,
-} from "./interfaces";
+import { OdspClientProps, OdspConnectionConfig, OdspContainerServices } from "./interfaces";
 import {
 	type ContainerSchema,
 	DOProviderContainerRuntimeFactory,
@@ -79,19 +74,24 @@ export class OdspClient {
 		);
 
 		const services = await this.getContainerServices(container);
-
+		console.log("created detached");
 		return { container: fluidContainer, services };
 	}
 
 	public async getContainer(
-		sharingUrl: string,
+		id: string,
 		containerSchema: ContainerSchema,
 	): Promise<{
 		container: IFluidContainer;
 		services: OdspContainerServices;
 	}> {
 		const loader = this.createLoader(containerSchema);
-		const container = await loader.resolve({ url: sharingUrl });
+		const url = new URL(this.properties.connection.siteUrl);
+		url.searchParams.append("driveId", this.properties.connection.driveId);
+		url.searchParams.append("itemId", id);
+		url.searchParams.append("path", "");
+		url.searchParams.append("containerPackageName", "no-dynamic-package");
+		const container = await loader.resolve({ url: url.href });
 
 		const rootDataObject = (await container.request({ url: "/" })).value;
 		const fluidContainer = new FluidContainer(container, rootDataObject);
@@ -132,25 +132,25 @@ export class OdspClient {
 		container: IContainer,
 		connection: OdspConnectionConfig,
 	): Promise<IFluidContainer> {
-		const createNewRequest = createOdspCreateContainerRequest(
-			connection.siteUrl,
-			connection.driveId,
-			connection.path,
-			uuid(),
-		);
-
 		const rootDataObject = (await container.request({ url: "/" })).value;
 
 		/**
 		 * See {@link FluidContainer.attach}
 		 */
 		const attach = async (): Promise<string> => {
+			const createNewRequest = createOdspCreateContainerRequest(
+				connection.siteUrl,
+				connection.driveId,
+				"",
+				uuid(),
+			);
+
 			if (container.attachState !== AttachState.Detached) {
 				throw new Error("Cannot attach container. Container is not in detached state");
 			}
 			await container.attach(createNewRequest);
 			const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
-			console.log("create: ", resolvedUrl.itemId);
+			console.log("create: ", resolvedUrl);
 			if (container.resolvedUrl === undefined) {
 				throw new Error("Resolved Url not available on attached container");
 			}
@@ -162,24 +162,7 @@ export class OdspClient {
 	}
 
 	private async getContainerServices(container: IContainer): Promise<OdspContainerServices> {
-		const getAttributes = async (): Promise<OdspServiceAttributes> => {
-			const resolvedUrl = container.resolvedUrl as IOdspResolvedUrl;
-			if (resolvedUrl === undefined) {
-				throw new Error("Resolved Url not available on attached container");
-			}
-			const url = await container.getAbsoluteUrl("/");
-			if (url === undefined) {
-				throw new Error("Container has no absolute url");
-			}
-
-			return {
-				sharingUrl: url,
-				driveId: resolvedUrl.driveId,
-			};
-		};
-
 		return {
-			tenantAttributes: getAttributes,
 			audience: new OdspAudience(container),
 		};
 	}

@@ -27,8 +27,6 @@ export interface OdspConnectionConfig {
 	 * RaaS Drive Id of the tenant where Fluid containers are created
 	 */
 	driveId: string;
-
-	path: string;
 }
 
 export interface OdspClientProps {
@@ -46,8 +44,6 @@ export interface OdspClientProps {
 	 * Base interface for providing configurations to control experimental features. If unsure, leave this undefined.
 	 */
 	// readonly configProvider?: IConfigProviderBase;
-
-	// readonly summaryCompression?: boolean | ICompressionStorageConfig;
 }
 
 export const tokenMap: Map<string, string> = new Map();
@@ -60,27 +56,11 @@ export const tokenMap: Map<string, string> = new Map();
  * use, will not be included here but rather on the FluidContainer class itself.
  */
 export interface OdspContainerServices {
-	tenantAttributes: () => Promise<OdspServiceAttributes | undefined>;
-
 	/**
 	 * Provides an object that can be used to get the users that are present in this Fluid session and
 	 * listeners for when the roster has any changes from users joining/leaving the session
 	 */
 	audience: IOdspAudience;
-}
-
-/**
- * This interface holds attributes specific to the odsp service
- */
-export interface OdspServiceAttributes {
-	/**
-	 * Generates a new link to point to this container based on the ContainerServiceConfiguration
-	 * this container was created with. If it was shared, this will create a new share link according
-	 * to the scope defined on the config. Otherwise, it will return a direct file link.
-	 */
-	sharingUrl: string;
-
-	driveId: string;
 }
 
 export interface OdspMember extends IMember {

@@ -1,5 +1,5 @@
 import { mergeStyles, Spinner } from "@fluentui/react";
-import { AzureContainerServices } from "@fluidframework/azure-client";
+// import { AzureContainerServices } from "@fluidframework/azure-client";
 import { IFluidContainer } from "fluid-framework";
 import * as React from "react";
 import { DndProvider } from "react-dnd";
@@ -7,10 +7,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { BrainstormModel, createBrainstormModel } from "../BrainstormModel";
 import { Header } from "./Header";
 import { NoteSpace } from "./NoteSpace";
+import { OdspContainerServices } from "../odsp-client";
 
 export const BrainstormView = (props: {
 	container: IFluidContainer;
-	services: AzureContainerServices;
+	services: OdspContainerServices;
 }) => {
 	const { container, services } = props;
 	const [model] = React.useState<BrainstormModel>(createBrainstormModel(container));

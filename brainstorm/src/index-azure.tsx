@@ -52,7 +52,7 @@ export async function start() {
 	ReactDOM.render(
 		<React.StrictMode>
 			<ThemeProvider theme={themeNameToTheme("default")}>
-				<BrainstormView container={container} services={services} />
+				{/* <BrainstormView container={container} services={services} /> */}
 			</ThemeProvider>
 		</React.StrictMode>,
 		document.getElementById("root"),
