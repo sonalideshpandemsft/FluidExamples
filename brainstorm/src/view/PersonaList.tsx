@@ -1,19 +1,20 @@
 import { IPersonaStyles, List, Persona, PersonaSize } from "@fluentui/react";
-import { AzureMember } from "@fluidframework/azure-client";
-import React from "react";
 
-export function PersonaList(props: { users: AzureMember[] }) {
+import React from "react";
+import { OdspMember } from "../odsp-client";
+
+export function PersonaList(props: { users: OdspMember[] }) {
 	const personaStyles: Partial<IPersonaStyles> = {
 		root: {
 			marginTop: 10,
 		},
 	};
 
-	const renderPersonaListItem = (item?: AzureMember) => {
+	const renderPersonaListItem = (item?: OdspMember) => {
 		return (
 			item && (
 				<Persona
-					text={item.userName}
+					text={item.name}
 					size={PersonaSize.size24}
 					styles={personaStyles}
 				></Persona>

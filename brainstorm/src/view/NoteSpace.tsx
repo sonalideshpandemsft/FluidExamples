@@ -1,15 +1,15 @@
 import { IStyle, mergeStyles, ThemeProvider } from "@fluentui/react";
-import { AzureMember } from "@fluidframework/azure-client";
 import React from "react";
 import { useDrop } from "react-dnd";
 import { NoteData, Position } from "../Types";
 import { Note } from "./Note";
 import { BrainstormModel } from "../BrainstormModel";
 import { lightTheme } from "./Themes";
+import { OdspMember } from "../odsp-client";
 
 export type NoteSpaceProps = Readonly<{
 	model: BrainstormModel;
-	author: AzureMember;
+	author: OdspMember;
 }>;
 
 export function NoteSpace(props: NoteSpaceProps) {
@@ -95,7 +95,7 @@ export function NoteSpace(props: NoteSpaceProps) {
 							note.id,
 							text,
 							props.author.userId,
-							props.author.userName,
+							props.author.name,
 							Date.now(),
 						);
 					};

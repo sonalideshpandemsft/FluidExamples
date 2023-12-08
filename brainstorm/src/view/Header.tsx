@@ -1,11 +1,11 @@
 import { Text, CommandBar, ICommandBarItemProps, Facepile } from "@fluentui/react";
-import { AzureMember } from "@fluidframework/azure-client";
 import React from "react";
 import { BrainstormModel } from "../BrainstormModel";
 import { DefaultColor } from "./Color";
 import { ColorPicker } from "./ColorPicker";
 import { NoteData } from "../Types";
 import { NOTE_SIZE } from "./Note.style";
+import { OdspMember } from "../odsp-client";
 
 function uuidv4() {
 	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -16,8 +16,8 @@ function uuidv4() {
 }
 export interface HeaderProps {
 	model: BrainstormModel;
-	author: AzureMember;
-	members: AzureMember[];
+	author: OdspMember;
+	members: OdspMember[];
 }
 
 export function Header(props: HeaderProps) {
@@ -26,7 +26,7 @@ export function Header(props: HeaderProps) {
 	const personas = React.useMemo(
 		() =>
 			props.members.map((member) => {
-				return { personaName: member.userName };
+				return { personaName: member.name };
 			}),
 		[props.members],
 	);
@@ -44,7 +44,7 @@ export function Header(props: HeaderProps) {
 			},
 			lastEdited: {
 				userId: props.author.userId,
-				userName: props.author.userName,
+				userName: props.author.name,
 				time: Date.now(),
 			},
 			author: props.author,

@@ -1,6 +1,6 @@
 import { IFluidContainer, ISharedMap, SharedMap } from "fluid-framework";
-import { AzureMember } from "@fluidframework/azure-client";
 import { NoteData, Position } from "./Types";
+import { OdspMember } from "./odsp-client";
 
 const c_NoteIdPrefix = "noteId_";
 const c_PositionPrefix = "position_";
@@ -11,7 +11,7 @@ const c_TextPrefix = "text_";
 const c_ColorPrefix = "color_";
 
 export type BrainstormModel = Readonly<{
-	CreateNote(noteId: string, myAuthor: AzureMember): NoteData;
+	CreateNote(noteId: string, myAuthor: OdspMember): NoteData;
 	MoveNote(noteId: string, newPos: Position): void;
 	SetNote(noteId: string, newCardData: NoteData): void;
 	SetNoteText(
@@ -22,8 +22,8 @@ export type BrainstormModel = Readonly<{
 		lastEditedTime: number,
 	): void;
 	SetNoteColor(noteId: string, noteColor: string): void;
-	LikeNote(noteId: string, author: AzureMember): void;
-	GetNoteLikedUsers(noteId: string): AzureMember[];
+	LikeNote(noteId: string, author: OdspMember): void;
+	GetNoteLikedUsers(noteId: string): OdspMember[];
 	DeleteNote(noteId: string): void;
 	NoteIds: string[];
 	setChangeListener(listener: () => void): void;
@@ -60,7 +60,7 @@ export function createBrainstormModel(fluid: IFluidContainer): BrainstormModel {
 		sharedMap.set(c_TextPrefix + noteId, noteText);
 		// update the note's last edited author name and timestamp
 		// WARNING: sharedMap does not preserve object references in the DDS map the same way it would be in a conventional map data structure.
-		// Hence, instead of storing the entire AzureMember object, we are only storing the necessary primitive data types metadata.
+		// Hence, instead of storing the entire OdspMember object, we are only storing the necessary primitive data types metadata.
 		sharedMap.set(c_LastEditedPrefix + noteId, {
 			userId: lastEditedId,
 			userName: lastEditedName,
@@ -74,7 +74,7 @@ export function createBrainstormModel(fluid: IFluidContainer): BrainstormModel {
 
 	return {
 		// Take all the note attributes data stored in the sharedMap and return it as NoteData
-		CreateNote(noteId: string, myAuthor: AzureMember): NoteData {
+		CreateNote(noteId: string, myAuthor: OdspMember): NoteData {
 			const newNote: NoteData = {
 				id: noteId,
 				lastEdited: sharedMap.get(c_LastEditedPrefix + noteId)!,
@@ -96,7 +96,7 @@ export function createBrainstormModel(fluid: IFluidContainer): BrainstormModel {
 		},
 
 		// Gets all the users that liked the note
-		GetNoteLikedUsers(noteId: string): AzureMember[] {
+		GetNoteLikedUsers(noteId: string): OdspMember[] {
 			return (
 				Array.from(sharedMap.keys())
 					// Filter keys that represent if a note was liked
@@ -132,18 +132,18 @@ export function createBrainstormModel(fluid: IFluidContainer): BrainstormModel {
 		SetNoteColor,
 
 		// Set or unset the note as liked by the user
-		LikeNote(noteId: string, user: AzureMember) {
+		LikeNote(noteId: string, user: OdspMember) {
 			const voteString = c_votePrefix + noteId + "_" + user.userId;
 
 			// WARNING: SharedMap does not preserve object references like a conventional map data structure, and object comparisons of SharedMap values
 			// will be invalid . In this case, it is recommended to only store the necessary primitive data types in SharedMap or implement a custom
 			// comparison function.
-			// Due to the warning above, instead of storing the entire AzureMember object, we are only storing the necessary primitive data types metadata.
+			// Due to the warning above, instead of storing the entire OdspMember object, we are only storing the necessary primitive data types metadata.
 			sharedMap.get(voteString)?.userId === user.userId
 				? sharedMap.set(voteString, undefined)
 				: sharedMap.set(voteString, {
 						userId: user.userId,
-						userName: user.userName,
+						userName: user.name,
 				  });
 		},
 

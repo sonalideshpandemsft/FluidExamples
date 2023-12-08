@@ -1,4 +1,4 @@
-import { AzureMember } from "@fluidframework/azure-client";
+import { OdspMember } from "./odsp-client";
 
 export type Position = Readonly<{ x: number; y: number }>;
 
@@ -6,7 +6,7 @@ export type NoteData = Readonly<{
 	id: any;
 	lastEdited: { userId: string; userName: string; time: number };
 	text?: string;
-	author: AzureMember;
+	author: OdspMember;
 	position: Position;
 	numLikesCalculated: number;
 	didILikeThisCalculated: boolean;

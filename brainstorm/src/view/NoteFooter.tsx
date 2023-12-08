@@ -1,9 +1,10 @@
 import React from "react";
 import { Text } from "@fluentui/react";
-import { AzureMember } from "@fluidframework/azure-client";
-import { NoteData } from "../Types";
 
-export type NoteFooterProps = { currentUser: AzureMember } & Pick<NoteData, "lastEdited">;
+import { NoteData } from "../Types";
+import { OdspMember } from "../odsp-client";
+
+export type NoteFooterProps = { currentUser: OdspMember } & Pick<NoteData, "lastEdited">;
 
 //deplay time in ms for waiting note content changes to be settle
 const delay = 2000;
@@ -17,7 +18,7 @@ export function NoteFooter(props: NoteFooterProps) {
 		// Dynamically display the last edited author name based on if the user is the last edited author
 		// If the user is the last edited author, display "you", otherwise, display the author's name.
 		lastEditedMemberName =
-			currentUser?.userName === lastEdited.userName ? "you" : lastEdited.userName;
+			currentUser?.name === lastEdited.userName ? "you" : lastEdited.userName;
 	} else {
 		// Display "..." to indicate the note is being edited.
 		lastEditedMemberName = "...";

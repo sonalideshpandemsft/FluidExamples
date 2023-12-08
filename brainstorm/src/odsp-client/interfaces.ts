@@ -5,7 +5,7 @@
 
 import { IMember, IServiceAudience } from "@fluidframework/fluid-static";
 import { ITelemetryBaseLogger } from "@fluidframework/common-definitions";
-import { ITokenProvider, IUser } from "@fluidframework/azure-client";
+import { ITokenProvider } from "@fluidframework/azure-client";
 
 /**
  * OdspConnectionConfig defines the necessary properties that will be applied to all containers
@@ -63,16 +63,35 @@ export interface OdspContainerServices {
 	audience: IOdspAudience;
 }
 
-export interface OdspMember extends IMember {
-	userName: string;
-	email: string;
-}
-
-export interface OdspUser extends IUser {
+export interface OdspUser {
 	/**
 	 * The user's name
 	 */
 	name: string;
+
+	email: string;
+
+	/**
+	 * The object ID or object Identifier. It is a unique identifier assigned to each user, group, or other entity within AAD or another Microsoft 365 service.
+	 * It is a GUID that uniquely identifies the object. When making Microsoft Graph API calls, you might need to reference or manipulate objects within the directory, and the `oid` is used to identify these objects.
+	 */
+	oid: string;
+}
+
+/**
+ * Since ODSP provides user names and email for all of its members, we extend the
+ * {@link @fluidframework/protocol-definitions#IMember} interface to include this service-specific value.
+ * It will be returned for all audience members connected.
+ * @internal
+ */
+export interface OdspMember extends IMember {
+	/**
+	 * The user's name
+	 */
+	name: string;
+	/**
+	 * The user's email
+	 */
 	email: string;
 }
 

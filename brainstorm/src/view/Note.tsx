@@ -1,5 +1,5 @@
 import { mergeStyles } from "@fluentui/react";
-import { AzureMember } from "@fluidframework/azure-client";
+
 import React from "react";
 import { useDrag } from "react-dnd";
 import { DefaultColor } from "./Color";
@@ -8,13 +8,14 @@ import { NoteData, Position } from "../Types";
 import { NoteHeader } from "./NoteHeader";
 import { NoteBody } from "./NoteBody";
 import { NoteFooter } from "./NoteFooter";
+import { OdspMember } from "../odsp-client";
 
 export type NoteProps = Readonly<{
 	id: string;
-	currentUser: AzureMember;
+	currentUser: OdspMember;
 	setPosition: (position: Position) => void;
 	onLike: () => void;
-	getLikedUsers: () => AzureMember[];
+	getLikedUsers: () => OdspMember[];
 	onDelete: () => void;
 	onColorChange: (color: string) => void;
 	setText: (text: string) => void;

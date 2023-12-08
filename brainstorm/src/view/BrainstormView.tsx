@@ -17,6 +17,7 @@ export const BrainstormView = (props: {
 	const [model] = React.useState<BrainstormModel>(createBrainstormModel(container));
 
 	const audience = services.audience;
+	console.log("Audience---", audience);
 	// retrieve all the members currently in the session
 	const [members, setMembers] = React.useState(Array.from(audience.getMembers().values()));
 	// set the user as the author so the user can be assigned as the author when needed

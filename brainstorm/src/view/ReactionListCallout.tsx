@@ -1,11 +1,12 @@
 import { Icon, Label, Stack } from "@fluentui/react";
-import { AzureMember } from "@fluidframework/azure-client";
+
 import React from "react";
 import { PersonaList } from "./PersonaList";
+import { OdspMember } from "../odsp-client";
 
 export type ReactionListCalloutProps = {
 	label: string;
-	usersToDisplay: AzureMember[];
+	usersToDisplay: OdspMember[];
 	reactionIconName?: string;
 };
 

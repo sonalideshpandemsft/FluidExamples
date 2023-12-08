@@ -27,7 +27,7 @@ const HeaderComponent = (props: NoteProps) => {
 	// Dynamically display a note's author name in the tooltip based on if the user is the author of the note.
 	// If the note is created by the user, display "you", otherwise display the author's name.
 	const tooltipAuthorName =
-		props.author.userName === props.currentUser.userName ? "you" : props.author.userName;
+		props.author.name === props.currentUser.name ? "you" : props.author.name;
 
 	const headerProps = {
 		className: mergeStyles(getHeaderStyleForColor(props.color)),
@@ -71,7 +71,7 @@ const HeaderComponent = (props: NoteProps) => {
 									userSelect: "none",
 								},
 							}}
-							text={props.author.userName}
+							text={props.author.name}
 							coinSize={24}
 						/>
 					</TooltipHost>
