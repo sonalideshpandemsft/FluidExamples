@@ -8,7 +8,7 @@ import {
 	AuthenticationResult,
 	InteractionRequiredAuthError,
 } from "@azure/msal-browser";
-import { tokenMap } from "../odsp-client";
+import { tokenMap } from "../odsp-client/OdspConfig";
 
 const msalConfig = {
 	auth: {

@@ -51,6 +51,7 @@
 	"dependencies": {
 		"@azure/msal-browser": "^2.34.0",
 		"@fluentui/react": "^8.71.0",
+		"@fluid-experimental/odsp-client": "2.0.0-dev.7.4.0.215366",
 		"@fluidframework/azure-client": "^1.1.0",
 		"@fluidframework/common-definitions": "^0.20.1",
 		"@fluidframework/container-definitions": "^1.3.5",

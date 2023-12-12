@@ -1,18 +1,19 @@
-import { type ITokenProvider, type ITokenResponse } from "@fluidframework/routerlicious-driver";
-import { tokenMap } from "../odsp-client";
+import { TokenResponse } from "@fluidframework/odsp-driver-definitions";
+import { IOdspTokenProvider } from "@fluid-experimental/odsp-client";
+import { tokenMap } from "../odsp-client/OdspConfig";
 
-export class OdspTokenConfig implements ITokenProvider {
+export class OdspTokenConfig implements IOdspTokenProvider {
 	// public constructor(siteUrl: string, itemId?: string) {}
 
-	public async fetchOrdererToken(tenantId: string, documentId?: string): Promise<ITokenResponse> {
+	public async fetchWebsocketToken(siteUrl: string, refresh: boolean): Promise<TokenResponse> {
 		return {
-			jwt: tokenMap.get("pushToken") as string,
+			token: tokenMap.get("pushToken") as string,
 		};
 	}
 
-	public async fetchStorageToken(tenantId: string, documentId: string): Promise<ITokenResponse> {
+	public async fetchStorageToken(siteUrl: string, refresh: boolean): Promise<TokenResponse> {
 		return {
-			jwt: tokenMap.get("sharePointToken") as string,
+			token: tokenMap.get("sharePointToken") as string,
 		};
 	}
 }

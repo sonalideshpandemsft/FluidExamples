@@ -11,11 +11,10 @@ import "./view/index.css";
 import "./view/App.css";
 import { themeNameToTheme } from "./view/Themes";
 import { containerSchema } from "./Config";
-import { OdspContainerServices } from "./odsp-client/interfaces";
-import { OdspClient } from "./odsp-client/OdspClient";
 import { ConnectionState } from "fluid-framework";
 import { getTokens } from "./msal/tokens";
-import { odspProps } from "./odsp-client";
+import { OdspClient, OdspContainerServices } from "@fluid-experimental/odsp-client";
+import { odspProps } from "./odsp-client/OdspConfig";
 
 export async function start() {
 	initializeIcons();
